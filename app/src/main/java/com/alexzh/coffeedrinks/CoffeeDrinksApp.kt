@@ -1,6 +1,7 @@
 package com.alexzh.coffeedrinks
 
 import android.app.Application
+import com.alexzh.coffeedrinks.di.coffeeDrinkDetailModule
 import com.alexzh.coffeedrinks.di.coffeeDrinksModule
 import com.alexzh.coffeedrinks.di.dataModule
 import com.alexzh.coffeedrinks.di.mapperModule
@@ -24,6 +25,7 @@ class CoffeeDrinksApp : Application() {
                 listOf(
                     dataModule,
                     coffeeDrinksModule,
+                    coffeeDrinkDetailModule,
                     mapperModule
                 )
             )

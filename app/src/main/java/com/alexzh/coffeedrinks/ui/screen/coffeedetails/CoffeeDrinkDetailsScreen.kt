@@ -30,13 +30,12 @@ import androidx.ui.text.style.TextAlign
 import androidx.ui.tooling.preview.Preview
 import androidx.ui.unit.dp
 import com.alexzh.coffeedrinks.R
-import com.alexzh.coffeedrinks.data.CoffeeDrinkRepository
-import com.alexzh.coffeedrinks.data.RuntimeCoffeeDrinkRepository
+import com.alexzh.coffeedrinks.ui.CoffeeDrinkDetailsViewModelAmbient
 import com.alexzh.coffeedrinks.ui.Screen
 import com.alexzh.coffeedrinks.ui.appTypography
 import com.alexzh.coffeedrinks.ui.lightThemeColors
 import com.alexzh.coffeedrinks.ui.navigateTo
-import com.alexzh.coffeedrinks.ui.screen.coffeedetails.mapper.CoffeeDrinkDetailMapper
+import com.alexzh.coffeedrinks.ui.observe
 import com.alexzh.coffeedrinks.ui.screen.coffeedetails.model.CoffeeDrinkDetail
 
 private const val SURFACE_TAG = "surface"
@@ -52,20 +51,18 @@ private const val DRINK_INGREDIENTS_TAG = "drink_ingredients"
 @Composable
 fun previewScreen() {
     val coffeeDrinkId = 1L
-    val repository = RuntimeCoffeeDrinkRepository
-    val mapper = CoffeeDrinkDetailMapper()
     MaterialTheme(colors = lightThemeColors, typography = appTypography) {
-        CoffeeDrinkDetailsScreen(repository, mapper, coffeeDrinkId)
+        CoffeeDrinkDetailsScreen(coffeeDrinkId)
     }
 }
 
 @Composable
 fun CoffeeDrinkDetailsScreen(
-    repository: CoffeeDrinkRepository,
-    mapper: CoffeeDrinkDetailMapper,
     coffeeDrinkId: Long
 ) {
-    val coffeeDrink = mapper.map(repository.getCoffeeDrink(coffeeDrinkId))
+    val viewModel = CoffeeDrinkDetailsViewModelAmbient.current
+    val coffeeDrink = observe(data = viewModel.coffeeDrink)
+    viewModel.loadCoffeeDrink(coffeeDrinkId)
 
     if (coffeeDrink == null) {
         navigateTo(Screen.CoffeeDrinks)
@@ -170,7 +167,7 @@ fun CoffeeDrinkDetailsScreen(
             modifier = Modifier.padding(end = 16.dp) + Modifier.tag(FAB_TAG),
             shape = CircleShape,
             backgroundColor = MaterialTheme.colors.secondary,
-            onClick = { onFavouriteStateChanged(repository, coffeeDrink) }
+            onClick = { onFavouriteStateChanged(viewModel, coffeeDrink) }
         ) {
             Icon(
                 painter = ImagePainter(
@@ -225,13 +222,8 @@ fun CoffeeDrinkDetailsScreen(
 }
 
 private fun onFavouriteStateChanged(
-    repository: CoffeeDrinkRepository,
+    viewModel: CoffeeDrinkDetailsViewModel,
     coffeeDrink: CoffeeDrinkDetail
 ) {
-    val newFavouriteState = !coffeeDrink.isFavourite
-    coffeeDrink.isFavourite = newFavouriteState
-
-    repository.getCoffeeDrink(coffeeDrink.id)?.copy(isFavourite = newFavouriteState)?.let {
-        repository.updateCoffeeDrink(it.id)
-    }
+    viewModel.changeFavouriteState(coffeeDrink)
 }

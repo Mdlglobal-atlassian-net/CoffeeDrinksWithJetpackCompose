@@ -10,6 +10,7 @@ import androidx.ui.foundation.isSystemInDarkTheme
 import androidx.ui.material.MaterialTheme
 import com.alexzh.coffeedrinks.data.CoffeeDrinkRepository
 import com.alexzh.coffeedrinks.ui.screen.coffeedetails.CoffeeDrinkDetailsScreen
+import com.alexzh.coffeedrinks.ui.screen.coffeedetails.CoffeeDrinkDetailsViewModel
 import com.alexzh.coffeedrinks.ui.screen.coffeedetails.mapper.CoffeeDrinkDetailMapper
 import com.alexzh.coffeedrinks.ui.screen.coffeedrinks.CoffeeDrinksScreen
 import com.alexzh.coffeedrinks.ui.screen.coffeedrinks.CoffeeDrinksViewModel
@@ -21,6 +22,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : AppCompatActivity() {
     private val coffeeDrinksViewModel: CoffeeDrinksViewModel by viewModel()
+    private val coffeeDrinkDetailsViewModel: CoffeeDrinkDetailsViewModel by viewModel()
 
     // TODO: remove it
     private val repository: CoffeeDrinkRepository by inject()
@@ -32,7 +34,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             Providers(
-                CoffeeDrinksViewModelAmbient provides coffeeDrinksViewModel
+                CoffeeDrinksViewModelAmbient provides coffeeDrinksViewModel,
+                CoffeeDrinkDetailsViewModelAmbient provides coffeeDrinkDetailsViewModel
             ) {
                 AppContent()
             }
@@ -52,8 +55,6 @@ class MainActivity : AppCompatActivity() {
                 when (screen) {
                     is Screen.CoffeeDrinks -> CoffeeDrinksScreen()
                     is Screen.CoffeeDrinkDetails -> CoffeeDrinkDetailsScreen(
-                        repository,
-                        coffeeDrinkDetailMapper,
                         screen.coffeeDrinkId
                     )
                     is Screen.OrderCoffeeDrinks -> OrderCoffeeDrinkScreen(

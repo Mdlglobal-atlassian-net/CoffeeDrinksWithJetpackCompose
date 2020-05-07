@@ -2,6 +2,7 @@ package com.alexzh.coffeedrinks.di
 
 import com.alexzh.coffeedrinks.data.CoffeeDrinkRepository
 import com.alexzh.coffeedrinks.data.RuntimeCoffeeDrinkRepository
+import com.alexzh.coffeedrinks.ui.screen.coffeedetails.CoffeeDrinkDetailsViewModel
 import com.alexzh.coffeedrinks.ui.screen.coffeedetails.mapper.CoffeeDrinkDetailMapper
 import com.alexzh.coffeedrinks.ui.screen.coffeedrinks.CoffeeDrinksViewModel
 import com.alexzh.coffeedrinks.ui.screen.coffeedrinks.mapper.CoffeeDrinkItemMapper
@@ -18,8 +19,12 @@ val coffeeDrinksModule = module {
     viewModel { CoffeeDrinksViewModel(repository = get(), mapper = get()) }
 }
 
+val coffeeDrinkDetailModule = module {
+    factory { CoffeeDrinkDetailMapper() }
+    viewModel { CoffeeDrinkDetailsViewModel(repository = get(), mapper = get()) }
+}
+
 // TODO: fix it by introducing feature modules
 val mapperModule = module {
-    factory { CoffeeDrinkDetailMapper() }
     factory { OrderCoffeeDrinkMapper() }
 }

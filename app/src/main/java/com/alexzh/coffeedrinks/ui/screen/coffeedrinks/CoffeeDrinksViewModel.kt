@@ -18,8 +18,9 @@ class CoffeeDrinksViewModel(
     val coffeeDrinks: LiveData<ModelList<CoffeeDrinkItem>> = _coffeeDrinks
 
     fun loadCoffeeDrinks() {
-        val modelList = ModelList<CoffeeDrinkItem>()
         viewModelScope.launch {
+            val modelList = ModelList<CoffeeDrinkItem>()
+
             repository.getCoffeeDrinks()
                 .forEach { modelList.add(mapper.map(it)) }
 
@@ -27,8 +28,8 @@ class CoffeeDrinksViewModel(
         }
     }
 
-    fun changeFavouriteState(coffeeDrink: CoffeeDrinkItem) {
-        repository.updateCoffeeDrink(coffeeDrink.id)
+    fun changeFavouriteState(currentCoffeeDrink: CoffeeDrinkItem) {
+        repository.updateCoffeeDrink(currentCoffeeDrink.id)
         loadCoffeeDrinks()
     }
 }
