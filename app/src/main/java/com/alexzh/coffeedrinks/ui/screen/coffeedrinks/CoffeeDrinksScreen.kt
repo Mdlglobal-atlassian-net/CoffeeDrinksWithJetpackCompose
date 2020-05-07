@@ -20,17 +20,14 @@ import androidx.ui.res.imageResource
 import androidx.ui.tooling.preview.Preview
 import androidx.ui.unit.dp
 import com.alexzh.coffeedrinks.R
-import com.alexzh.coffeedrinks.data.CoffeeDrinkRepository
-import com.alexzh.coffeedrinks.data.RuntimeCoffeeDrinkRepository
+import com.alexzh.coffeedrinks.ui.CoffeeDrinksViewModelAmbient
 import com.alexzh.coffeedrinks.ui.Screen
 import com.alexzh.coffeedrinks.ui.appTypography
 import com.alexzh.coffeedrinks.ui.lightThemeColors
 import com.alexzh.coffeedrinks.ui.navigateTo
-import com.alexzh.coffeedrinks.ui.screen.coffeedrinks.mapper.CoffeeDrinkItemMapper
+import com.alexzh.coffeedrinks.ui.observe
 import com.alexzh.coffeedrinks.ui.screen.coffeedrinks.model.CardType
 import com.alexzh.coffeedrinks.ui.screen.coffeedrinks.model.CoffeeDrinkItem
-
-private val coffeeDrinks = ModelList<CoffeeDrinkItem>()
 
 val cardType = CardType(isDetailedCard = false)
 
@@ -38,32 +35,27 @@ val cardType = CardType(isDetailedCard = false)
 @Composable
 fun previewCoffeeDrinksScreen() {
     MaterialTheme(colors = lightThemeColors, typography = appTypography) {
-        CoffeeDrinksScreen(
-            repository = RuntimeCoffeeDrinkRepository,
-            mapper = CoffeeDrinkItemMapper()
-        )
+        CoffeeDrinksScreen()
     }
 }
 
 @Composable
-fun CoffeeDrinksScreen(
-    repository: CoffeeDrinkRepository,
-    mapper: CoffeeDrinkItemMapper
-) {
-    coffeeDrinks.clear()
-    coffeeDrinks.addAll(
-        repository.getCoffeeDrinks().map { mapper.map(it) }
-    )
+fun CoffeeDrinksScreen() {
+    val viewModel = CoffeeDrinksViewModelAmbient.current
+    val coffeeDrinks = observe(viewModel.coffeeDrinks)
+    viewModel.loadCoffeeDrinks()
 
-    Surface {
-        Column {
-            CoffeeDrinkAppBar(cardType)
-            CoffeeDrinkList(
-                cardType = cardType,
-                coffeeDrinks = coffeeDrinks,
-                onCoffeeDrinkClicked = { onCoffeeDrinkClicked(it) },
-                onFavouriteStateChanged = { onCoffeeFavouriteStateChanged(repository, it) }
-            )
+    if (coffeeDrinks != null) {
+        Surface {
+            Column {
+                CoffeeDrinkAppBar(cardType)
+                CoffeeDrinkList(
+                    cardType = cardType,
+                    coffeeDrinks = coffeeDrinks,
+                    onCoffeeDrinkClicked = { onCoffeeDrinkClicked(it) },
+                    onFavouriteStateChanged = { onCoffeeFavouriteStateChanged(viewModel, it) }
+                )
+            }
         }
     }
 }
@@ -133,19 +125,10 @@ fun CoffeeDrinkList(
 }
 
 private fun onCoffeeFavouriteStateChanged(
-    repository: CoffeeDrinkRepository,
+    viewModel: CoffeeDrinksViewModel,
     coffee: CoffeeDrinkItem
 ) {
-    val newFavouriteState = !coffee.isFavourite
-
-    val index = coffeeDrinks.indexOf(coffee)
-    coffeeDrinks[index].isFavourite = newFavouriteState
-
-    repository.getCoffeeDrink(coffee.id)?.copy(isFavourite = newFavouriteState)?.let {
-        repository.updateCoffeeDrink(
-            it
-        )
-    }
+    viewModel.changeFavouriteState(coffee)
 }
 
 private fun onCoffeeDrinkClicked(coffee: CoffeeDrinkItem) {

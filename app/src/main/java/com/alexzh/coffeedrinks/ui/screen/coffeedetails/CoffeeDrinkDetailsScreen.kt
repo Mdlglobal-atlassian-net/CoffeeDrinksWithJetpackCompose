@@ -232,6 +232,6 @@ private fun onFavouriteStateChanged(
     coffeeDrink.isFavourite = newFavouriteState
 
     repository.getCoffeeDrink(coffeeDrink.id)?.copy(isFavourite = newFavouriteState)?.let {
-        repository.updateCoffeeDrink(it)
+        repository.updateCoffeeDrink(it.id)
     }
 }
