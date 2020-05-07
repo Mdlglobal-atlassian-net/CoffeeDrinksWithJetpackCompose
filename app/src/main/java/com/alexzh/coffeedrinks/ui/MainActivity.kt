@@ -42,13 +42,13 @@ class MainActivity : AppCompatActivity() {
                 when (screen) {
                     is Screen.CoffeeDrinks -> CoffeeDrinksScreen(repository, coffeeDrinkItemMapper)
                     is Screen.CoffeeDrinkDetails -> CoffeeDrinkDetailsScreen(
-                        repository,
-                        coffeeDrinkDetailMapper,
-                        screen.coffeeDrinkId
+                            repository,
+                            coffeeDrinkDetailMapper,
+                            screen.coffeeDrinkId
                     )
                     is Screen.OrderCoffeeDrinks -> OrderCoffeeDrinkScreen(
-                        repository,
-                        orderCoffeeDrinkMapper
+                            repository,
+                            orderCoffeeDrinkMapper
                     )
                 }
             }
